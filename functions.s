@@ -1,3 +1,10 @@
+	.file	"functions.c"
+	.intel_syntax noprefix
+	.text
+	.data
+	.align 32
+	.type	pow10, @object
+	.size	pow10, 88
 pow10:
 	.long	0
 	.long	1072693248
