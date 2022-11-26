@@ -88,7 +88,7 @@ find_zero:
 	call	function                        # if (function(m)..
 	pxor	xmm1, xmm1
 	comisd	xmm1, xmm0
-	jbe	.                                   #                .. < 0
+	jbe	.L10                                 #                .. < 0
 	movsd	xmm0, QWORD PTR -32[rbp]
 	movsd	QWORD PTR -8[rbp], xmm0         # l := m
 	jmp	.L4
