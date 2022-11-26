@@ -5,7 +5,7 @@
 	.align 32
 	.type	pow10, @object
 	.size	pow10, 88
-pow10:
+pow10:                      # набор констант для разной точности
 	.long	0
 	.long	1072693248
 	.long	2576980378
@@ -32,75 +32,78 @@ pow10:
 	.globl	function
 	.type	function, @function
 function:
-	endbr64
 	push	rbp
 	mov	rbp, rsp
-	movsd	QWORD PTR -8[rbp], xmm0
-	movsd	xmm0, QWORD PTR -8[rbp]
-	mulsd	xmm0, xmm0
+	movsd	QWORD PTR -8[rbp], xmm0     # double x <=> -8[rbp]
+	movsd	xmm0, QWORD PTR -8[rbp]     # xmm0 := x
+	mulsd	xmm0, xmm0                  # xmm0 = x^2
 	movapd	xmm1, xmm0
-	mulsd	xmm1, QWORD PTR -8[rbp]
-	movsd	xmm0, QWORD PTR -8[rbp]
-	movapd	xmm2, xmm0
-	mulsd	xmm2, xmm0
-	movsd	xmm0, QWORD PTR .LC0[rip]
-	mulsd	xmm0, xmm2
-	subsd	xmm1, xmm0
-	movsd	xmm2, QWORD PTR -8[rbp]
-	movsd	xmm0, QWORD PTR .LC1[rip]
-	mulsd	xmm0, xmm2
-	addsd	xmm0, xmm1
-	movsd	xmm1, QWORD PTR .LC2[rip]
-	subsd	xmm0, xmm1
-	pop	rbp
+	mulsd	xmm1, QWORD PTR -8[rbp]     # xmm1 = x^3
+	movsd	xmm0, QWORD PTR -8[rbp]     # xmm0 := x
+	movapd	xmm2, xmm0                  # xmm2 := x
+	mulsd	xmm2, xmm0                  # xmm2 = x^2
+	movsd	xmm0, QWORD PTR .LC0[rip]   # xmm0 := 0.5
+	mulsd	xmm0, xmm2                  # xmm0 = x^2 * 0.5
+	subsd	xmm1, xmm0                  # xmm1 = x^3 - x^2 * 0.5
+	movsd	xmm2, QWORD PTR -8[rbp]     # xmm2 := x
+	movsd	xmm0, QWORD PTR .LC1[rip]   # xmm0 := 0.2
+	mulsd	xmm0, xmm2                  # xmm0 = x * 0.2
+	addsd	xmm0, xmm1                  # xmm0 = x^3 - x^2 * 0.5 + x * 0.2
+	movsd	xmm1, QWORD PTR .LC2[rip]   # xmm1 := 4
+	subsd	xmm0, xmm1                  # xmm0 = x^3 - x^2 * 0.5 + x * 0.2 - 4
+	pop	rbp                             # f(x)
 	ret
+
 	.size	function, .-function
 	.globl	find_zero
 	.type	find_zero, @function
 find_zero:
-	endbr64
 	push	rbp
 	mov	rbp, rsp
 	sub	rsp, 40
-	mov	DWORD PTR -36[rbp], edi
+	mov	DWORD PTR -36[rbp], edi             # int precision <=> -36[rbp]
 	movsd	xmm0, QWORD PTR .LC3[rip]
-	movsd	QWORD PTR -8[rbp], xmm0
+	movsd	QWORD PTR -8[rbp], xmm0         # double l = 1
+	                                        # l <=> -8[rbp]
 	movsd	xmm0, QWORD PTR .LC4[rip]
-	movsd	QWORD PTR -16[rbp], xmm0
+	movsd	QWORD PTR -16[rbp], xmm0        # double r = 3
+                                            # r <=> -16[rbp]
 	mov	eax, DWORD PTR -36[rbp]
-	add	eax, 1
-	cdqe
+	add	eax, 1                              # ..[precision+1]
 	lea	rdx, 0[0+rax*8]
 	lea	rax, pow10[rip]
-	movsd	xmm0, QWORD PTR [rdx+rax]
-	movsd	QWORD PTR -24[rbp], xmm0
+	movsd	xmm0, QWORD PTR [rdx+rax]       # pow10[precision+1]
+	movsd	QWORD PTR -24[rbp], xmm0        # double step = pow10[precision+1]
+	                                        # step <=> -24[rbp]
 	jmp	.L4
 .L7:
 	movsd	xmm0, QWORD PTR -16[rbp]
 	addsd	xmm0, QWORD PTR -8[rbp]
-	movsd	xmm1, QWORD PTR .LC5[rip]
-	divsd	xmm0, xmm1
-	movsd	QWORD PTR -32[rbp], xmm0
+	movsd	xmm1, QWORD PTR .LC5[rip]       # xmm1 := 2
+	divsd	xmm0, xmm1                      # xmm0 := (r + l) / 2
+	movsd	QWORD PTR -32[rbp], xmm0        # double m = (r + l) / 2
+	                                        # double m <=> -32[rbp]
 	mov	rax, QWORD PTR -32[rbp]
 	movq	xmm0, rax
-	call	function
+	call	function                        # if (function(m)..
 	pxor	xmm1, xmm1
 	comisd	xmm1, xmm0
-	jbe	.L10
+	jbe	.                                   #                .. < 0
 	movsd	xmm0, QWORD PTR -32[rbp]
-	movsd	QWORD PTR -8[rbp], xmm0
+	movsd	QWORD PTR -8[rbp], xmm0         # l := m
 	jmp	.L4
 .L10:
 	movsd	xmm0, QWORD PTR -32[rbp]
-	movsd	QWORD PTR -16[rbp], xmm0
+	movsd	QWORD PTR -16[rbp], xmm0        # r := m
 .L4:
-	movsd	xmm0, QWORD PTR -16[rbp]
-	subsd	xmm0, QWORD PTR -8[rbp]
-	comisd	xmm0, QWORD PTR -24[rbp]
+	movsd	xmm0, QWORD PTR -16[rbp]        # xmm0 := r
+	subsd	xmm0, QWORD PTR -8[rbp]         #           - l
+	comisd	xmm0, QWORD PTR -24[rbp]        #                 >? step
 	ja	.L7
-	movsd	xmm0, QWORD PTR -16[rbp]
+	movsd	xmm0, QWORD PTR -16[rbp]        # xmm0 := r
 	leave
-	ret
+	ret                                     # return r
+
 	.size	find_zero, .-find_zero
 	.section	.rodata
 	.align 8
