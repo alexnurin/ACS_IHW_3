@@ -1,6 +1,6 @@
 # Архитектуры вычислительных систем. ИДЗ № 3. Вариант 33 <br/> Нарин Алексей БПИ217.
 
-# Описание репозитория: (доделать)
+# Описание репозитория:
 * [Решение задачи на C](https://github.com/alexnurin/ACS_IHW_3/tree/main/C_files)
 * [Папка с неоптимизированными файлами ассемблера](https://github.com/alexnurin/ACS_IHW_3/tree/main/ASM_wo_optimisations)
 * [Оптимизированный код ассемблера](https://github.com/alexnurin/ACS_IHW_3/tree/main/ASM_optimized)
