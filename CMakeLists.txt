@@ -3,4 +3,4 @@ project(IHW_3 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(IHW_3 main.c functions.c)
+add_executable(IHW_3 C_files/main.c C_files/functions.c)
