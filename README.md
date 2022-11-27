@@ -4,7 +4,7 @@
 * [Решение задачи на C](https://github.com/alexnurin/ACS_IHW_3/tree/main/C_files)
 * [Папка с неоптимизированными файлами ассемблера](https://github.com/alexnurin/ACS_IHW_3/tree/main/ASM_wo_optimisations)
 * [Оптимизированный код ассемблера](https://github.com/alexnurin/ACS_IHW_3/tree/main/ASM_optimized)
-* [Тесты]()
+* [Тесты](https://github.com/alexnurin/ACS_IHW_3/tree/main/Tests)
 
 # Отчёт о выполненных задачах (работал на оценку 7)
 * 👍 Задача решена на языке C
