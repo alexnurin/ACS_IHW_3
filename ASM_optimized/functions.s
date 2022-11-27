@@ -31,25 +31,24 @@ pow10:                      # набор констант для разной т
 	.text
 	.globl	function
 	.type	function, @function
-function:
+function:                               # xmm0 = x
 	push	rbp
 	mov	rbp, rsp
-	movsd	QWORD PTR -8[rbp], xmm0     # double x <=> -8[rbp]
-	movsd	xmm0, QWORD PTR -8[rbp]     # xmm0 := x
-	mulsd	xmm0, xmm0                  # xmm0 = x^2
 	movapd	xmm1, xmm0
-	mulsd	xmm1, QWORD PTR -8[rbp]     # xmm1 = x^3
-	movsd	xmm0, QWORD PTR -8[rbp]     # xmm0 := x
-	movapd	xmm2, xmm0                  # xmm2 := x
-	mulsd	xmm2, xmm0                  # xmm2 = x^2
-	movsd	xmm0, QWORD PTR .LC0[rip]   # xmm0 := 0.5
-	mulsd	xmm0, xmm2                  # xmm0 = x^2 * 0.5
-	subsd	xmm1, xmm0                  # xmm1 = x^3 - x^2 * 0.5
-	movsd	xmm2, QWORD PTR -8[rbp]     # xmm2 := x
-	movsd	xmm0, QWORD PTR .LC1[rip]   # xmm0 := 0.2
-	mulsd	xmm0, xmm2                  # xmm0 = x * 0.2
-	addsd	xmm0, xmm1                  # xmm0 = x^3 - x^2 * 0.5 + x * 0.2
+	mulsd	xmm1, xmm1                  # xmm1 := x^2
+    movapd	xmm2, xmm1                  # xmm2 := x^2
+	mulsd	xmm2, xmm0                  # xmm2 = x^3
+
+	movsd	xmm3, QWORD PTR .LC0[rip]   # xmm3 := 0.5
+	mulsd	xmm3, xmm1                  # xmm3 = x^2 * 0.5
+	subsd	xmm2, xmm3                  # xmm2 = x^3 - x^2 * 0.5
+
+	movsd	xmm3, QWORD PTR .LC1[rip]   # xmm3 := 0.2
+	mulsd	xmm3, xmm0                  # xmm3 = x * 0.2
+	addsd	xmm2, xmm3                  # xmm2 = x^3 - x^2 * 0.5 + x * 0.2
+
 	movsd	xmm1, QWORD PTR .LC2[rip]   # xmm1 := 4
+	movapd  xmm0, xmm2
 	subsd	xmm0, xmm1                  # xmm0 = x^3 - x^2 * 0.5 + x * 0.2 - 4
 	pop	rbp                             # f(x)
 	ret
