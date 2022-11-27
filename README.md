@@ -1,11 +1,10 @@
 # Архитектуры вычислительных систем. ИДЗ № 3. Вариант 33 <br/> Нарин Алексей БПИ217.
 
 # Описание репозитория: (доделать)
-* [Решение задачи на C](https://github.com/alexnurin/ACS_IHW_2/tree/master/C_Files)
-* [Папка с неоптимизированными файлами ассемблера](https://github.com/alexnurin/ACS_IHW_2/tree/master/ASM%20not%20optimized)
-* [Промежуточно оптимизированный код ассемблера](https://github.com/alexnurin/ACS_IHW_2/tree/master/ASM_for_5)
-* [Финальный код ассемблера](https://github.com/alexnurin/ACS_IHW_2/tree/master/ASM_for_7)
-* [Тесты](https://github.com/alexnurin/ACS_IHW_2/tree/master/ASM_for_7)
+* [Решение задачи на C](https://github.com/alexnurin/ACS_IHW_3/tree/main/C_files)
+* [Папка с неоптимизированными файлами ассемблера](https://github.com/alexnurin/ACS_IHW_3/tree/main/ASM_wo_optimisations)
+* [Оптимизированный код ассемблера](https://github.com/alexnurin/ACS_IHW_3/tree/main/ASM_optimized)
+* [Тесты]()
 
 # Отчёт о выполненных задачах (работал на оценку 7)
 * 👍 Задача решена на языке C
@@ -92,14 +91,61 @@ endbr64
 ```
 
 Оптимизирован алгоритм вычисления функции: теперь xmm0 не вызывается как посредник для каждого переноса значений со стека,
-а хранит результат функции
+а хранит результат функции. <br/>
+
+```assembly
+function:
+	endbr64
+	push	rbp
+	mov	rbp, rsp
+	movsd	QWORD PTR -8[rbp], xmm0
+	movsd	xmm0, QWORD PTR -8[rbp]
+	mulsd	xmm0, xmm0
+	movapd	xmm1, xmm0
+	mulsd	xmm1, QWORD PTR -8[rbp]
+	movsd	xmm0, QWORD PTR -8[rbp]
+	movapd	xmm2, xmm0
+	mulsd	xmm2, xmm0
+	movsd	xmm0, QWORD PTR .LC0[rip]
+	mulsd	xmm0, xmm2
+	subsd	xmm1, xmm0
+	movsd	xmm2, QWORD PTR -8[rbp]
+	movsd	xmm0, QWORD PTR .LC1[rip]
+	mulsd	xmm0, xmm2
+	addsd	xmm0, xmm1
+	movsd	xmm1, QWORD PTR .LC2[rip]
+	subsd	xmm0, xmm1
+	pop	rbp
+	ret
+```
+<br/>Стало:<rb/>
+``` assembly
+function:                               # xmm0 = x
+	push	rbp
+	mov	rbp, rsp
+	movapd	xmm1, xmm0
+	mulsd	xmm1, xmm1                  # xmm1 := x^2
+    movapd	xmm2, xmm1                  # xmm2 := x^2
+	mulsd	xmm2, xmm0                  # xmm2 = x^3
+	movsd	xmm3, QWORD PTR .LC0[rip]   # xmm3 := 0.5
+	mulsd	xmm3, xmm1                  # xmm3 = x^2 * 0.5
+	subsd	xmm2, xmm3                  # xmm2 = x^3 - x^2 * 0.5
+	movsd	xmm3, QWORD PTR .LC1[rip]   # xmm3 := 0.2
+	mulsd	xmm3, xmm0                  # xmm3 = x * 0.2
+	addsd	xmm2, xmm3                  # xmm2 = x^3 - x^2 * 0.5 + x * 0.2
+	movsd	xmm1, QWORD PTR .LC2[rip]   # xmm1 := 4
+	movapd  xmm0, xmm2
+	subsd	xmm0, xmm1                  # xmm0 = x^3 - x^2 * 0.5 + x * 0.2 - 4
+	pop	rbp                             # f(x)
+	ret
+```
 
 В результате оптимизаций помимо уменьшения использования стека, сократилась количество строк кода. Это можно увидеть на сравнении [изначальных файлов ассемблера](https://github.com/alexnurin/ACS_IHW_2/tree/master/ASM%20not%20optimized) и [оптимизированных](https://github.com/alexnurin/ACS_IHW_2/tree/master/ASM_for_7):
 * main.s
   241 -> 209
 * functions.s
-  147 -> 100
-### Суммарное число строк уменьшилось на 79
+  147 -> 144
+### Суммарное число строк уменьшилось на 35.
 
 
 
