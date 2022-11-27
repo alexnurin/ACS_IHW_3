@@ -65,11 +65,9 @@ main:
 	jne	.L6
 	mov	rax, QWORD PTR -144[rbp]
 	add	rax, 8                          # argv[1]
-	mov	rax, QWORD PTR [rax]
-	lea	rcx, -40[rbp]                   # char *p
+	lea	rsi, -40[rbp]                   # char *p
 	mov	edx, 10
-	mov	rsi, rcx
-	mov	rdi, rax
+	mov	rdi, QWORD PTR [rax]
 	call	strtol@PLT                  # strtol(rdi,      rsi, edx)
 	                        # precision = strtol(argv[1],  &p,  10)
 	mov	DWORD PTR -28[rbp], eax
@@ -115,21 +113,11 @@ main:
 	jne	.L11
 .L10:
 	mov	QWORD PTR -128[rbp], 3092014    # char s1[80] <=> -128[rbp]
-	mov	QWORD PTR -120[rbp], 0
-	mov	QWORD PTR -112[rbp], 0
-	mov	QWORD PTR -104[rbp], 0
-	mov	QWORD PTR -96[rbp], 0
-	mov	QWORD PTR -88[rbp], 0
-	mov	QWORD PTR -80[rbp], 0
-	mov	QWORD PTR -72[rbp], 0
-	mov	QWORD PTR -64[rbp], 0
-	mov	QWORD PTR -56[rbp], 0
 	mov	rax, QWORD PTR -144[rbp]
 	add	rax, 8
 	mov	rdx, QWORD PTR [rax]            # argv[1]
-	lea	rax, -128[rbp]
 	mov	rsi, rdx
-	mov	rdi, rax
+	lea	rdi, -128[rbp]
 	call	strcat@PLT                  # strcat(s1, argv[1])
 	lea	rsi, .LC4[rip]
 	mov	rdi, rax
@@ -139,9 +127,8 @@ main:
 	mov	rax, QWORD PTR -144[rbp]
 	add	rax, 16                         # argv[2];
 	mov	rdx, QWORD PTR [rax]
-	lea	rax, -128[rbp]
+	lea	rdi, -128[rbp]
 	mov	rsi, rdx
-	mov	rdi, rax
 	call	strcat@PLT                  # strcat(s1, argv[2])
 	lea	rsi, .LC5[rip]
 	mov	rdi, rax
